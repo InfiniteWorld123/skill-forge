@@ -23,6 +23,8 @@ export const auth = betterAuth({
 		user: {
 			create: {
 				after: async (user) => {
+					await db.insert(schema.studentProfile).values({ userId: user.id });
+
 					await sendEmail({
 						to: user.email,
 						subject: "Welcome to Skill Forge",

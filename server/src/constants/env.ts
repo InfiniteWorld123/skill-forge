@@ -15,7 +15,13 @@ const getOptionalEnvVar = (key: string) => {
 };
 
 export const env = {
+	BETTER_AUTH_SECRET: getEnvVar("BETTER_AUTH_SECRET"),
+	BETTER_AUTH_URL: getEnvVar("BETTER_AUTH_URL"),
 	DATABASE_URL: getEnvVar("DATABASE_URL"),
+	EMAIL_FROM:
+		getOptionalEnvVar("EMAIL_FROM") ??
+		"Skill Forge No Reply <skill-forge@yamanwarda.dev>",
+	RESEND: getEnvVar("RESEND"),
 } as const;
 
 export type EnvVariables = typeof env;

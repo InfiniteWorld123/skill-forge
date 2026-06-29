@@ -14,13 +14,13 @@ The database is built with:
 The main schema file is:
 
 ```txt
-server/src/db/schemas/schema.ts
+src/db/schemas/schema.ts
 ```
 
 The generated SQL migration is:
 
 ```txt
-server/src/db/migrations/0000_dashing_omega_red.sql
+src/db/migrations/0000_dashing_omega_red.sql
 ```
 
 ## Big Idea
@@ -226,6 +226,10 @@ Important columns:
 - `email`: login email.
 - `email_verified`: true or false.
 - `image`: profile image URL.
+- `role`: Better Auth account role, usually `user` or `admin`.
+- `banned`: true if the account is blocked from signing in.
+- `ban_reason`: why the account was banned.
+- `ban_expires`: when a temporary ban ends.
 - `created_at`, `updated_at`: timestamps.
 
 Business meaning:
@@ -233,11 +237,13 @@ Business meaning:
 - Everyone starts as a user.
 - A user can learn.
 - A user can also become a teacher.
-- Admin is not stored as a role. Admin is checked with `ADMIN_EMAIL` from environment config.
+- Account admin access uses Better Auth's admin plugin.
 
-Why no `role` column?
+Important role note:
 
-Because one account can be both student and teacher. A simple `role = student` or `role = teacher` would be too limited.
+The `role` column is only for account security, for example `admin` or `user`.
+It is not used to decide if someone is a student or teacher.
+One account can still be both a student and a teacher because that comes from `student_profile` and `teacher_profile`.
 
 ### `session`
 
@@ -1035,8 +1041,31 @@ These are rules the backend should enforce.
 - Every account can learn.
 - Every account gets a `student_profile` at signup.
 - A user becomes a teacher by creating a `teacher_profile`.
-- No normal database role is needed.
-- Admin is checked by `ADMIN_EMAIL`.
+- Better Auth `role` is used only for account security, like `admin` or `user`.
+- Student and teacher identity is still handled by profile tables, not by `role`.
+
+### Auth Context Middleware
+
+The backend uses `src/shared/middlewares/auth-context.ts` to read the current Better Auth session.
+
+It stores this information on the Hono request context:
+
+- `user`: the signed-in Better Auth user, or null.
+- `session`: the signed-in Better Auth session, or null.
+- `authContext`: simple authorization flags for the current request.
+
+The important flags are:
+
+- `isAdmin`: true when the account has the Better Auth `admin` role, matches `ADMIN_USER_ID`, or matches `ADMIN_EMAIL`.
+- `isStudent`: true when the user has a `student_profile`.
+- `isTeacher`: true when the user has a `teacher_profile`.
+
+Important:
+
+- Admin is an account security role.
+- Student is a learning profile.
+- Teacher is a teaching profile.
+- One user can be student and teacher at the same time.
 
 ### Courses
 

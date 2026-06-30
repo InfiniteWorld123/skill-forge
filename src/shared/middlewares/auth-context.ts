@@ -149,8 +149,8 @@ export const requireTeacher = createMiddleware(async (c, next) => {
 		throw unauthorizedError("You must be signed in");
 	}
 
-	if (!currentAuth.isTeacher) {
-		throw forbiddenError("Teacher profile is required");
+	if (!currentAuth.isTeacher && !currentAuth.isAdmin) {
+		throw forbiddenError("Teacher profile or admin access is required");
 	}
 
 	await next();
@@ -163,8 +163,22 @@ export const requireStudent = createMiddleware(async (c, next) => {
 		throw unauthorizedError("You must be signed in");
 	}
 
-	if (!currentAuth.isStudent) {
-		throw forbiddenError("Student profile is required");
+	if (!currentAuth.isStudent && !currentAuth.isAdmin) {
+		throw forbiddenError("Student profile or admin access is required");
+	}
+
+	await next();
+});
+
+export const requireStudentOrAdmin = createMiddleware(async (c, next) => {
+	const currentAuth = getAuthContext(c);
+
+	if (!currentAuth.isAuthenticated) {
+		throw unauthorizedError("You must be signed in");
+	}
+
+	if (!currentAuth.isStudent && !currentAuth.isAdmin) {
+		throw forbiddenError("Student profile or admin access is required");
 	}
 
 	await next();

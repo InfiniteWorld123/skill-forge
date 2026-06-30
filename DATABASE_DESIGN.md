@@ -1066,6 +1066,9 @@ Important:
 - Student is a learning profile.
 - Teacher is a teaching profile.
 - One user can be student and teacher at the same time.
+- Admin can access admin, student, and teacher actions.
+- Student-only checks allow `isStudent` or `isAdmin`.
+- Teacher-only checks allow `isTeacher` or `isAdmin`.
 
 ### Courses
 

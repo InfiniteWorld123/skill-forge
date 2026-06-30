@@ -23,7 +23,7 @@ export const listAccountRolesService = () => {
 			{
 				name: "admin",
 				businessMeaning:
-					"Can manage auth users, roles, bans, impersonation, and sessions.",
+					"Can access every admin, student, and teacher action in the platform.",
 			},
 			{
 				name: "user",
